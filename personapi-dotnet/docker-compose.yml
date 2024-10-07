@@ -1,0 +1,33 @@
+services:
+  webapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5062:5062"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    networks:
+      - webapp-network
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserverexpress
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Password123
+      - MSSQL_PID=Express
+    volumes:
+      - sql_data:/var/opt/mssql
+    networks:
+      - webapp-network
+
+networks:
+  webapp-network:
+    driver: bridge
+
+volumes:
+  sql_data:
+    driver: local
