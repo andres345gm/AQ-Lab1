@@ -21,7 +21,6 @@ services:
     environment:
       - ACCEPT_EULA=Y
       - MSSQL_SA_PASSWORD=Password123
-      - MSSQL_PID=Express
     volumes:
       - sql_data:/var/opt/mssql
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
