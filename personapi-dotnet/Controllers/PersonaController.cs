@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using personapi_dotnet.Interfaces;
 using personapi_dotnet.Models.Entities;
-using personapi_dotnet.Models.Interfaces;
 
 namespace personapi_dotnet.Controllers
 {

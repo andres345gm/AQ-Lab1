@@ -1,9 +1,9 @@
-﻿using personapi_dotnet.Models.Entities;
-using personapi_dotnet.Models.Interfaces;
+﻿using personapi_dotnet.Interfaces;
+using personapi_dotnet.Models.Entities;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace personapi_dotnet.Models.Repositories
+namespace personapi_dotnet.Repositories
 {
     public class EstudioRepository : IEstudioRepository
     {

@@ -1,10 +1,10 @@
 ﻿using personapi_dotnet.Models.Entities;
-using personapi_dotnet.Models.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using personapi_dotnet.Interfaces;
 
-namespace personapi_dotnet.Models.Repositories
+namespace personapi_dotnet.Repositories
 {
     public class ProfesionRepository : IProfesionRepository
     {
