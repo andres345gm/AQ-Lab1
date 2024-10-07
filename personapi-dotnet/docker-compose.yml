@@ -7,12 +7,15 @@ services:
       - "5062:5062"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=db;Database=persondb;User=sa;Password=Password123;TrustServerCertificate=True;
+    depends_on:
+      - db
     networks:
       - webapp-network
 
-  sqlserver:
+  db:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: sqlserverexpress
+    container_name: db
     ports:
       - "1433:1433"
     environment:
@@ -21,6 +24,7 @@ services:
       - MSSQL_PID=Express
     volumes:
       - sql_data:/var/opt/mssql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - webapp-network
 
