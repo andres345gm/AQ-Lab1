@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using personapi_dotnet.Models.Entities;
+using personapi_dotnet.Repositories; // Asegúrate de que estás importando el espacio de nombres de tus repositorios
+using personapi_dotnet.Interfaces; // Asegúrate de tener las interfaces correspondientes
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +12,12 @@ builder.Services.AddControllersWithViews();
 // Configurar DbContext
 builder.Services.AddDbContext<PersonaDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Registrar repositorios e interfaces
+builder.Services.AddScoped<IEstudioRepository, EstudioRepository>();
+builder.Services.AddScoped<IPersonaRepository, PersonaRepository>();
+builder.Services.AddScoped<IProfesionRepository, ProfesionRepository>();
+builder.Services.AddScoped<ITelefonoRepository, TelefonoRepository>();
 
 // Configurar Swagger
 builder.Services.AddSwaggerGen(c =>
