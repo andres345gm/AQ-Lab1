@@ -3,19 +3,20 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
 WORKDIR /app
 
 # Copia el archivo .csproj y restaura las dependencias
-COPY *.csproj ./
+COPY personapi-dotnet/*.csproj ./personapi-dotnet/
+WORKDIR /app/personapi-dotnet
 RUN dotnet restore
 
 # Copia todo el contenido del proyecto
-COPY . ./
+COPY personapi-dotnet/ ./
 
 # Publica la aplicación en un directorio "out"
 RUN dotnet publish -c Release -o out
 
 # Usa una imagen más ligera de .NET 8 para ejecutar la aplicación
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
-WORKDIR /app
-COPY --from=build-env /app/out .
+WORKDIR /app/personapi-dotnet
+COPY --from=build-env /app/personapi-dotnet/out .
 
 # Expone el puerto en el que la aplicación correrá (ajustar si es necesario)
 EXPOSE 5062

@@ -1,3 +1,4 @@
+version: '3.8'
 services:
   webapi:
     build:
@@ -23,9 +24,12 @@ services:
       - MSSQL_SA_PASSWORD=Password123
     volumes:
       - sql_data:/var/opt/mssql
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./init.sql:/usr/src/app/init.sql
+      - ./entrypoint.sh:/usr/src/app/entrypoint.sh
     networks:
       - webapp-network
+    user: root
+    entrypoint: /bin/bash -c "apt-get update && apt-get install -y mssql-tools unixodbc-dev && /usr/src/app/entrypoint.sh"
 
 networks:
   webapp-network:
