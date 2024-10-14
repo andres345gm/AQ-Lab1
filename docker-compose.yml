@@ -1,0 +1,40 @@
+version: '3.8'
+services:
+  webapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5062:5062"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=db;Database=persondb;User=sa;Password=Password123;TrustServerCertificate=True;
+    depends_on:
+      - db
+    networks:
+      - webapp-network
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: db
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Password123
+    volumes:
+      - sql_data:/var/opt/mssql
+      - ./init.sql:/usr/src/app/init.sql
+      - ./entrypoint.sh:/usr/src/app/entrypoint.sh
+    networks:
+      - webapp-network
+    user: root
+    entrypoint: /bin/bash -c "apt-get update && apt-get install -y mssql-tools unixodbc-dev && /usr/src/app/entrypoint.sh"
+
+networks:
+  webapp-network:
+    driver: bridge
+
+volumes:
+  sql_data:
+    driver: local

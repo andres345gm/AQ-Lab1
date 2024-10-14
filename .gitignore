@@ -1,0 +1,10 @@
+# Ignorar archivos de configuración de Visual Studio
+.vs/
+*.user
+*.suo
+
+# Ignorar carpetas de compilación
+bin/
+obj/
+personapi-dotnet/bin/
+personapi-dotnet/bin/Debug/net8.0
