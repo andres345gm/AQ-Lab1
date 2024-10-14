@@ -2,6 +2,8 @@
 using personapi_dotnet.Models.Entities;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace personapi_dotnet.Repositories
 {
@@ -24,26 +26,29 @@ namespace personapi_dotnet.Repositories
             return _context.Telefonos.Find(num);
         }
 
-        public void Add(Telefono telefono)
+        public async Task<Telefono> Add(Telefono telefono)
         {
-            _context.Telefonos.Add(telefono);
-            _context.SaveChanges();
+            await _context.Telefonos.AddAsync(telefono);
+            await _context.SaveChangesAsync();
+            return telefono;
         }
 
-        public void Update(Telefono telefono)
+        public async Task<bool> Update(Telefono telefono)
         {
-            _context.Telefonos.Update(telefono);
-            _context.SaveChanges();
+            _context.Entry(telefono).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return true;
         }
 
-        public void Delete(string num)
+        public async Task<bool> Delete(string num)
         {
             var telefono = _context.Telefonos.Find(num);
-            if (telefono != null)
-            {
-                _context.Telefonos.Remove(telefono);
-                _context.SaveChanges();
+            if (telefono == null) {
+                return false;
             }
+            _context.Set<Telefono>().Remove(telefono);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

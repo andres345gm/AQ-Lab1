@@ -1,4 +1,5 @@
-﻿using personapi_dotnet.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using personapi_dotnet.Interfaces;
 using personapi_dotnet.Models.Entities;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,26 +25,30 @@ namespace personapi_dotnet.Repositories
             return _context.Personas.Find(cc);
         }
 
-        public void Add(Persona persona)
+        public async Task<Persona> Add(Persona persona)
         {
-            _context.Personas.Add(persona);
-            _context.SaveChanges();
+            await _context.Personas.AddAsync(persona);
+            await _context.SaveChangesAsync();
+            return persona;
         }
 
-        public void Update(Persona persona)
+        public async Task<bool> Update(Persona persona)
         {
-            _context.Personas.Update(persona);
-            _context.SaveChanges();
+            _context.Entry(persona).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return true;
         }
 
-        public void Delete(int cc)
+        public async Task<bool> Delete(int cc)
         {
             var persona = _context.Personas.Find(cc);
-            if (persona != null)
+            if (persona == null)
             {
-                _context.Personas.Remove(persona);
-                _context.SaveChanges();
+                return false;
             }
+            _context.Set<Persona>().Remove(persona);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

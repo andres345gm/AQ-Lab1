@@ -11,7 +11,7 @@ builder.Services.AddControllersWithViews();
 
 // Configurar DbContext
 builder.Services.AddDbContext<PersonaDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("PersonaDb")));
 
 // Registrar repositorios e interfaces
 builder.Services.AddScoped<IEstudioRepository, EstudioRepository>();

@@ -1,31 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace personapi_dotnet.Models.Entities;
 
 public partial class PersonaDbContext : DbContext
 {
-    public PersonaDbContext()
-    {
-    }
+    private readonly IConfiguration _configuration;
 
-    public PersonaDbContext(DbContextOptions<PersonaDbContext> options)
+    public PersonaDbContext(DbContextOptions<PersonaDbContext> options, IConfiguration configuration)
         : base(options)
     {
+        _configuration = configuration;
     }
 
     public virtual DbSet<Estudio> Estudios { get; set; }
-
     public virtual DbSet<Persona> Personas { get; set; }
-
     public virtual DbSet<Profesion> Profesions { get; set; }
-
     public virtual DbSet<Telefono> Telefonos { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=db;Database=arq_per_db;User=sa;Password=Password123;TrustServerCertificate=True;");
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
+            // Obtiene la cadena de conexión desde appsettings.json
+            var connectionString = _configuration.GetConnectionString("PersonaDb");
+            optionsBuilder.UseSqlServer(connectionString);
+        }
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

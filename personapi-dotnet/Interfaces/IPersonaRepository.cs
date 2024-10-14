@@ -6,8 +6,8 @@ namespace personapi_dotnet.Interfaces
     {
         IEnumerable<Persona> GetAll();
         Persona GetById(int cc);
-        void Add(Persona persona);
-        void Update(Persona persona);
-        void Delete(int cc);
+        Task<Persona> Add(Persona persona);
+        Task<bool> Update(Persona persona);
+        Task<bool> Delete(int cc);
     }
 }

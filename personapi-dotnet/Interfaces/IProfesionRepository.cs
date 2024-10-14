@@ -6,8 +6,8 @@ namespace personapi_dotnet.Interfaces
     {
         IEnumerable<Profesion> GetAll();
         Profesion GetById(int id);
-        void Add(Profesion profesion);
-        void Update(Profesion profesion);
-        void Delete(int id);
+        Task<Profesion> Add(Profesion profesion);
+        Task<bool> Update(Profesion profesion);
+        Task<bool> Delete(int id);
     }
 }

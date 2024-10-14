@@ -26,26 +26,30 @@ namespace personapi_dotnet.Repositories
             return _context.Profesions.Find(id);
         }
 
-        public void Add(Profesion profesion)
+        public async Task<Profesion> Add(Profesion profesion)
         {
-            _context.Profesions.Add(profesion);
-            _context.SaveChanges();
+            await _context.AddAsync(profesion);
+            await _context.SaveChangesAsync();
+            return profesion;
         }
 
-        public void Update(Profesion profesion)
+        public async Task<bool> Update(Profesion profesion)
         {
-            _context.Profesions.Update(profesion);
-            _context.SaveChanges();
+            _context.Entry(profesion).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return true;
         }
 
-        public void Delete(int id)
+        public async Task<bool> Delete(int id)
         {
             var profesion = _context.Profesions.Find(id);
-            if (profesion != null)
+            if (profesion == null)
             {
-                _context.Profesions.Remove(profesion);
-                _context.SaveChanges();
+                return false;
             }
+            _context.Profesions.Remove(profesion);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

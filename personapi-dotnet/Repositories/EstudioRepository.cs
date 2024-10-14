@@ -2,6 +2,8 @@
 using personapi_dotnet.Models.Entities;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace personapi_dotnet.Repositories
 {
@@ -24,26 +26,30 @@ namespace personapi_dotnet.Repositories
             return _context.Estudios.Find(id_prof, cc_per);
         }
 
-        public void Add(Estudio estudio)
+        public async Task<Estudio> Add(Estudio estudio)
         {
-            _context.Estudios.Add(estudio);
-            _context.SaveChanges();
+            await _context.Estudios.AddAsync(estudio);
+            await _context.SaveChangesAsync();
+            return estudio;
         }
 
-        public void Update(Estudio estudio)
+        public async Task<bool> Update(Estudio estudio)
         {
-            _context.Estudios.Update(estudio);
-            _context.SaveChanges();
+            _context.Entry(estudio).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return true;
         }
 
-        public void Delete(int id_prof, int cc_per)
+        public async Task<bool> Delete(int id_prof, int cc_per)
         {
             var estudio = _context.Estudios.Find(id_prof, cc_per);
-            if (estudio != null)
+            if (estudio == null)
             {
-                _context.Estudios.Remove(estudio);
-                _context.SaveChanges();
+                return false;
             }
+            _context.Set<Estudio>().Remove(estudio);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

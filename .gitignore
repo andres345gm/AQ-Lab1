@@ -8,3 +8,4 @@ bin/
 obj/
 personapi-dotnet/bin/
 personapi-dotnet/bin/Debug/net8.0
+personapi-dotnet/obj/

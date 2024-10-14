@@ -6,8 +6,8 @@ namespace personapi_dotnet.Interfaces
     {
         IEnumerable<Estudio> GetAll();
         Estudio GetById(int id_prof, int cc_per);
-        void Add(Estudio estudio);
-        void Update(Estudio estudio);
-        void Delete(int id_prof, int cc_per);
+        Task<Estudio> Add(Estudio estudio);
+        Task<bool> Update(Estudio estudio);
+        Task<bool> Delete(int id_prof, int cc_per);
     }
 }
