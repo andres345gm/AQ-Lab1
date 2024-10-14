@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\juanj\\source\\repos\\personapi-dotnet\\personapi-dotnet\\personapi-dotnet.csproj": {}
+    "C:\\Users\\andre\\Documents\\taller dotnet\\personapi-dotnet\\personapi-dotnet.csproj": {}
   },
   "projects": {
-    "C:\\Users\\juanj\\source\\repos\\personapi-dotnet\\personapi-dotnet\\personapi-dotnet.csproj": {
+    "C:\\Users\\andre\\Documents\\taller dotnet\\personapi-dotnet\\personapi-dotnet.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\juanj\\source\\repos\\personapi-dotnet\\personapi-dotnet\\personapi-dotnet.csproj",
+        "projectUniqueName": "C:\\Users\\andre\\Documents\\taller dotnet\\personapi-dotnet\\personapi-dotnet.csproj",
         "projectName": "personapi-dotnet",
-        "projectPath": "C:\\Users\\juanj\\source\\repos\\personapi-dotnet\\personapi-dotnet\\personapi-dotnet.csproj",
-        "packagesPath": "C:\\Users\\juanj\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\juanj\\source\\repos\\personapi-dotnet\\personapi-dotnet\\obj\\",
+        "projectPath": "C:\\Users\\andre\\Documents\\taller dotnet\\personapi-dotnet\\personapi-dotnet.csproj",
+        "packagesPath": "C:\\Users\\andre\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\andre\\Documents\\taller dotnet\\personapi-dotnet\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\juanj\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\andre\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -63,6 +63,10 @@
             "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
               "target": "Package",
               "version": "[8.0.5, )"
+            },
+            "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[6.8.1, )"
             }
           },
           "imports": [
@@ -84,7 +88,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.401/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
