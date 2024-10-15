@@ -44,5 +44,10 @@ namespace personapi_dotnet.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<bool> PersonaExistsAsync(int id)
+        {
+            return await _context.Personas.AnyAsync(p => p.Cc == id);
+        }
     }
 }

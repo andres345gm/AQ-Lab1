@@ -1,43 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.ConstrainedExecution;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+using personapi_dotnet.Interfaces;
 using personapi_dotnet.Models.Entities;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace personapi_dotnet.Controllers
 {
     public class EstudiosController : Controller
     {
-        private readonly PersonaDbContext _context;
+        private readonly IEstudioRepository _estudioRepository;
+        private readonly IPersonaRepository _personaRepository;
+        private readonly IProfesionRepository _profesionRepository;
 
-        public EstudiosController(PersonaDbContext context)
+        public EstudiosController(IEstudioRepository estudioRepository, IPersonaRepository personaRepository, IProfesionRepository profesionRepository)
         {
-            _context = context;
+            _estudioRepository = estudioRepository;
+            _personaRepository = personaRepository;
+            _profesionRepository = profesionRepository;
         }
 
         // GET: Estudios
         public async Task<IActionResult> Index()
         {
-            var personaDbContext = _context.Estudios.Include(e => e.CcPerNavigation).Include(e => e.IdProfNavigation);
-            return View(await personaDbContext.ToListAsync());
+            var estudios = await _estudioRepository.GetAllAsync();
+            return View(estudios);
         }
 
         // GET: Estudios/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int? idProf, int? ccPer)
         {
-            if (id == null)
+            if (idProf == null || ccPer == null)
             {
                 return NotFound();
             }
 
-            var estudio = await _context.Estudios
-                .Include(e => e.CcPerNavigation)
-                .Include(e => e.IdProfNavigation)
-                .FirstOrDefaultAsync(m => m.IdProf == id);
+            var estudio = await _estudioRepository.GetByIdAsync((int)ccPer, (int)idProf);
             if (estudio == null)
             {
                 return NotFound();
@@ -47,40 +45,30 @@ namespace personapi_dotnet.Controllers
         }
 
         // GET: Estudios/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["CcPer"] = new SelectList(_context.Personas, "Cc", "Cc");
-            ViewData["IdProf"] = new SelectList(_context.Profesions, "Id", "Id");
+            ViewData["CcPer"] = new SelectList(await _personaRepository.GetAllAsync(), "Cc", "Cc");
+            ViewData["IdProf"] = new SelectList(await _profesionRepository.GetAllAsync(), "Id", "Id");
             return View();
         }
 
         // POST: Estudios/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("IdProf,CcPer,Fecha,Univer")] Estudio estudio)
         {
+            var profPerExiste = await _estudioRepository.GetByIdAsync(estudio.CcPer, estudio.IdProf) != null;
 
-            bool profPerExiste = await _context.Estudios
-                .AnyAsync(p => p.IdProf == estudio.IdProf && p.CcPer == estudio.CcPer);
-
-            // Si el teléfono ya existe, se muestra en la pantalla
             if (profPerExiste)
             {
-                Console.WriteLine("El prof con per ya está");
                 ModelState.AddModelError("CcPer", "La profesión para esa persona ya existe.");
             }
             else
             {
-                var profesion = await _context.Profesions.FirstOrDefaultAsync(m =>
-                    m.Id == estudio.IdProf
-                );
+                var profesion = await _profesionRepository.GetByIdAsync(estudio.IdProf);
                 estudio.IdProfNavigation = profesion;
 
-                var persona = await _context.Personas.FirstOrDefaultAsync(m =>
-                     m.Cc == estudio.CcPer
-                );
+                var persona = await _personaRepository.GetByIdAsync(estudio.CcPer);
                 estudio.CcPerNavigation = persona;
 
                 ModelState.Clear();
@@ -88,57 +76,49 @@ namespace personapi_dotnet.Controllers
 
                 if (ModelState.IsValid)
                 {
-                    _context.Add(estudio);
-                    await _context.SaveChangesAsync();
+                    await _estudioRepository.AddAsync(estudio);
                     return RedirectToAction(nameof(Index));
                 }
-
             }
 
-            ViewData["CcPer"] = new SelectList(_context.Personas, "Cc", "Cc", estudio.CcPer);
-            ViewData["IdProf"] = new SelectList(_context.Profesions, "Id", "Id", estudio.IdProf);
+            ViewData["CcPer"] = new SelectList(await _personaRepository.GetAllAsync(), "Cc", "Cc", estudio.CcPer);
+            ViewData["IdProf"] = new SelectList(await _profesionRepository.GetAllAsync(), "Id", "Id", estudio.IdProf);
             return View(estudio);
         }
 
         // GET: Estudios/Edit/5
-        public async Task<IActionResult> Edit(int? IdProf, int? CcPer)
+        public async Task<IActionResult> Edit(int? idProf, int? ccPer)
         {
-            if (IdProf == null || CcPer == null)
+            if (idProf == null || ccPer == null)
             {
                 return NotFound();
             }
-            var estudio = await _context.Estudios
-            .FirstOrDefaultAsync(e => e.IdProf == IdProf && e.CcPer == CcPer);
 
+            var estudio = await _estudioRepository.GetByIdAsync((int)ccPer, (int)idProf);
             if (estudio == null)
             {
                 return NotFound();
             }
-            ViewData["CcPer"] = new SelectList(_context.Personas, "Cc", "Cc", estudio.CcPer);
-            ViewData["IdProf"] = new SelectList(_context.Profesions, "Id", "Id", estudio.IdProf);
+
+            ViewData["CcPer"] = new SelectList(await _personaRepository.GetAllAsync(), "Cc", "Cc", estudio.CcPer);
+            ViewData["IdProf"] = new SelectList(await _profesionRepository.GetAllAsync(), "Id", "Id", estudio.IdProf);
             return View(estudio);
         }
 
         // POST: Estudios/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int IdProf, int CcPer, [Bind("IdProf,CcPer,Fecha,Univer")] Estudio estudio)
+        public async Task<IActionResult> Edit(int idProf, int ccPer, [Bind("IdProf,CcPer,Fecha,Univer")] Estudio estudio)
         {
-            if (IdProf != estudio.IdProf || CcPer != estudio.CcPer)
+            if (idProf != estudio.IdProf || ccPer != estudio.CcPer)
             {
                 return NotFound();
             }
 
-            var profesion = await _context.Profesions.FirstOrDefaultAsync(m =>
-                    m.Id == estudio.IdProf
-                );
+            var profesion = await _profesionRepository.GetByIdAsync(estudio.IdProf);
             estudio.IdProfNavigation = profesion;
 
-            var persona = await _context.Personas.FirstOrDefaultAsync(m =>
-                 m.Cc == estudio.CcPer
-            );
+            var persona = await _personaRepository.GetByIdAsync(estudio.CcPer);
             estudio.CcPerNavigation = persona;
 
             ModelState.Clear();
@@ -148,12 +128,11 @@ namespace personapi_dotnet.Controllers
             {
                 try
                 {
-                    _context.Update(estudio);
-                    await _context.SaveChangesAsync();
+                    await _estudioRepository.UpdateAsync(estudio);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!EstudioExists(estudio.IdProf, estudio.CcPer))
+                    if (!await EstudioExists(estudio.IdProf, estudio.CcPer))
                     {
                         return NotFound();
                     }
@@ -164,23 +143,21 @@ namespace personapi_dotnet.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CcPer"] = new SelectList(_context.Personas, "Cc", "Cc", estudio.CcPer);
-            ViewData["IdProf"] = new SelectList(_context.Profesions, "Id", "Id", estudio.IdProf);
+
+            ViewData["CcPer"] = new SelectList(await _personaRepository.GetAllAsync(), "Cc", "Cc", estudio.CcPer);
+            ViewData["IdProf"] = new SelectList(await _profesionRepository.GetAllAsync(), "Id", "Id", estudio.IdProf);
             return View(estudio);
         }
 
         // GET: Estudios/Delete/5
-        public async Task<IActionResult> Delete(int? Idprof, int? CcPer)
+        public async Task<IActionResult> Delete(int? idProf, int? ccPer)
         {
-            if (Idprof == null || CcPer == null)
+            if (idProf == null || ccPer == null)
             {
                 return NotFound();
             }
 
-            var estudio = await _context.Estudios
-                .Include(e => e.CcPerNavigation)
-                .Include(e => e.IdProfNavigation)
-                .FirstOrDefaultAsync(m => m.IdProf == Idprof && m.CcPer == CcPer);
+            var estudio = await _estudioRepository.GetByIdAsync((int)ccPer, (int)idProf);
             if (estudio == null)
             {
                 return NotFound();
@@ -192,22 +169,15 @@ namespace personapi_dotnet.Controllers
         // POST: Estudios/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int IdProf, int CcPer)
+        public async Task<IActionResult> DeleteConfirmed(int idProf, int ccPer)
         {
-            var estudio = await _context.Estudios
-                .FirstOrDefaultAsync(e => e.IdProf == IdProf && e.CcPer == CcPer);
-            if (estudio != null)
-            {
-                _context.Estudios.Remove(estudio);
-            }
-
-            await _context.SaveChangesAsync();
+            await _estudioRepository.DeleteAsync(ccPer, idProf);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool EstudioExists(int IdProf, int CcPer )
+        private async Task<bool> EstudioExists(int idProf, int ccPer)
         {
-            return _context.Estudios.Any(e => e.IdProf == IdProf && e.CcPer == CcPer);
+            return await _estudioRepository.GetByIdAsync(ccPer, idProf) != null;
         }
     }
 }

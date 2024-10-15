@@ -9,5 +9,6 @@ namespace personapi_dotnet.Interfaces
         Task AddAsync(Persona persona);
         Task UpdateAsync(Persona persona);
         Task DeleteAsync(int id);
+        Task<bool> PersonaExistsAsync(int id);
     }
 }
