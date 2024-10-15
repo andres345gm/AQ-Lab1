@@ -38,23 +38,23 @@ namespace personapi_dotnet.Controllers.api
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(string numero, string operador, int duenioCedula)
+        public async Task<IActionResult> Create([FromBody] Telefono telefono)
         {
-            var persona = await _personaRepository.GetByIdAsync(duenioCedula);
+            var persona = await _personaRepository.GetByIdAsync(telefono.Duenio);
             if (persona == null)
             {
                 return BadRequest("La persona con la cédula proporcionada no existe.");
             }
 
-            var telefono = new Telefono
+            // Verificar si el teléfono ya existe
+            if (await _telefonoRepository.TelefonoExistsAsync(telefono.Num))
             {
-                Num = numero,
-                Oper = operador,
-                Duenio = duenioCedula
-            };
+                return Conflict("El número de teléfono ya existe.");
+            }
 
-            persona.Telefonos.Add(telefono);
-            await _personaRepository.UpdateAsync(persona);
+            // Asignar el dueño al teléfono
+            telefono.DuenioNavigation = persona;
+            await _telefonoRepository.AddAsync(telefono);
 
             var options = new JsonSerializerOptions
             {
@@ -67,7 +67,7 @@ namespace personapi_dotnet.Controllers.api
         }
 
         [HttpPut("{numero}")]
-        public async Task<IActionResult> Update(string numero, string oper)
+        public async Task<IActionResult> Update(string numero, [FromBody] Telefono telefono)
         {
             var existingTelefono = await _telefonoRepository.GetByNumberAsync(numero);
             if (existingTelefono == null)
@@ -75,7 +75,10 @@ namespace personapi_dotnet.Controllers.api
                 return NotFound();
             }
 
-            existingTelefono.Oper = oper;
+            existingTelefono.Oper = telefono.Oper;
+            existingTelefono.Duenio = telefono.Duenio;
+            existingTelefono.DuenioNavigation = await _personaRepository.GetByIdAsync(telefono.Duenio);
+
             await _telefonoRepository.UpdateAsync(existingTelefono);
 
             return NoContent();
@@ -84,6 +87,12 @@ namespace personapi_dotnet.Controllers.api
         [HttpDelete("{numero}")]
         public async Task<IActionResult> Delete(string numero)
         {
+            var telefono = await _telefonoRepository.GetByNumberAsync(numero);
+            if (telefono == null)
+            {
+                return NotFound();
+            }
+
             await _telefonoRepository.DeleteAsync(numero);
             return NoContent();
         }

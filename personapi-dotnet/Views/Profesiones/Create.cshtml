@@ -4,38 +4,43 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h1>Create Profesion</h1>
+                <a asp-action="Index" class="btn btn-link" title="Back to List">
+                    <i class="bi bi-arrow-left-circle" style="font-size: 1.5rem;"></i>
+                </a>
+            </div>
 
-<h4>Profesion</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Id" class="control-label"></label>
-                <input asp-for="Id" class="form-control" />
-                <span asp-validation-for="Id" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Nom" class="control-label"></label>
-                <input asp-for="Nom" class="form-control" />
-                <span asp-validation-for="Nom" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Des" class="control-label"></label>
-                <input asp-for="Des" class="form-control" />
-                <span asp-validation-for="Des" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Id" class="form-control shadow-sm" placeholder="Id" />
+                    <label asp-for="Id">Id</label>
+                    <span asp-validation-for="Id" class="text-danger"></span>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Nom" class="form-control shadow-sm" placeholder="Nombre" />
+                    <label asp-for="Nom">Nombre</label>
+                    <span asp-validation-for="Nom" class="text-danger"></span>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Des" class="form-control shadow-sm" placeholder="Descripción" />
+                    <label asp-for="Des">Descripción</label>
+                    <span asp-validation-for="Des" class="text-danger"></span>
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-lg">Create</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {

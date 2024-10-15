@@ -9,5 +9,6 @@ namespace personapi_dotnet.Interfaces
         Task AddAsync(Profesion profesion);
         Task UpdateAsync(Profesion profesion);
         Task DeleteAsync(int id);
+        Task<bool> ProfesionExistsAsync(int id);
     }
 }

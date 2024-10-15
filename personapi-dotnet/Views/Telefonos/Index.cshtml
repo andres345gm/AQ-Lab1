@@ -1,47 +1,41 @@
 ﻿@model IEnumerable<personapi_dotnet.Models.Entities.Telefono>
 
-@{
+    @{
     ViewData["Title"] = "Index";
-}
+    }
 
-<h1>Index</h1>
+    <h1>Telefonos</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Oper)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DuenioNavigation)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Num)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Oper)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DuenioNavigation.Cc)
-            </td>
-            <td>
-                    @Html.DisplayFor(modelItem => item.Num)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Num">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Num">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Num">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    <p>
+        <a asp-action="Create" class="btn btn-primary btn-lg mb-3">Create New</a>
+    </p>
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.First().Num)</th>
+                <th>@Html.DisplayNameFor(model => model.First().Oper)</th>
+                <th>@Html.DisplayNameFor(model => model.First().Duenio)</th>
+                <th class="text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model) {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Num)</td>
+                <td>@Html.DisplayFor(modelItem => item.Oper)</td>
+                <td>@Html.DisplayFor(modelItem => item.Duenio)</td>
+                <td class="text-center">
+                    <a asp-action="Edit" asp-route-id="@item.Num" class="btn btn-sm btn-warning me-1" title="Edit">
+                        <i class="bi bi-pencil-square"></i>
+                    </a>
+                    <a asp-action="Details" asp-route-id="@item.Num" class="btn btn-sm btn-info me-1" title="Details">
+                        <i class="bi bi-info-circle"></i>
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@item.Num" class="btn btn-sm btn-danger" title="Delete">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>

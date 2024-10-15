@@ -10,5 +10,6 @@ namespace personapi_dotnet.Interfaces
         Task AddAsync(Telefono telefono);
         Task UpdateAsync(Telefono telefono);
         Task DeleteAsync(string numero);
+        Task<bool> TelefonoExistsAsync(string numero); 
     }
 }

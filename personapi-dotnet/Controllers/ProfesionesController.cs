@@ -1,27 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using personapi_dotnet.Interfaces;
 using personapi_dotnet.Models.Entities;
 
 namespace personapi_dotnet.Controllers
 {
     public class ProfesionesController : Controller
     {
-        private readonly PersonaDbContext _context;
+        private readonly IProfesionRepository _profesionRepository;
 
-        public ProfesionesController(PersonaDbContext context)
+        public ProfesionesController(IProfesionRepository profesionRepository)
         {
-            _context = context;
+            _profesionRepository = profesionRepository;
         }
 
         // GET: Profesiones
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Profesions.ToListAsync());
+            var profesions = await _profesionRepository.GetAllAsync();
+            return View(profesions);
         }
 
         // GET: Profesiones/Details/5
@@ -32,8 +32,7 @@ namespace personapi_dotnet.Controllers
                 return NotFound();
             }
 
-            var profesion = await _context.Profesions
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var profesion = await _profesionRepository.GetByIdAsync(id.Value);
             if (profesion == null)
             {
                 return NotFound();
@@ -49,34 +48,21 @@ namespace personapi_dotnet.Controllers
         }
 
         // POST: Profesiones/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Nom,Des")] Profesion profesion)
         {
-            // Verificar si el teléfono ya existe
-            bool profesionExiste = await _context.Profesions
-                .AnyAsync(t => t.Id == profesion.Id);
-
-            // Si el teléfono ya existe, se muestra en la pantalla
-            if (profesionExiste)
+            if (await _profesionRepository.ProfesionExistsAsync(profesion.Id))
             {
                 ModelState.AddModelError("Id", "El id de profesión ya existe.");
             }
-            else
-            {
-                ModelState.Clear();
 
-                if (ModelState.IsValid)
-                {
-                    _context.Add(profesion);
-                    await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
-                }
+            if (ModelState.IsValid)
+            {
+                await _profesionRepository.AddAsync(profesion);
+                return RedirectToAction(nameof(Index));
             }
 
-            
             return View(profesion);
         }
 
@@ -88,17 +74,16 @@ namespace personapi_dotnet.Controllers
                 return NotFound();
             }
 
-            var profesion = await _context.Profesions.FindAsync(id);
+            var profesion = await _profesionRepository.GetByIdAsync(id.Value);
             if (profesion == null)
             {
                 return NotFound();
             }
+
             return View(profesion);
         }
 
         // POST: Profesiones/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Nom,Des")] Profesion profesion)
@@ -112,22 +97,20 @@ namespace personapi_dotnet.Controllers
             {
                 try
                 {
-                    _context.Update(profesion);
-                    await _context.SaveChangesAsync();
+                    await _profesionRepository.UpdateAsync(profesion);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ProfesionExists(profesion.Id))
+                    if (!await _profesionRepository.ProfesionExistsAsync(profesion.Id))
                     {
                         return NotFound();
                     }
-                    else
-                    {
-                        throw;
-                    }
+                    throw;
                 }
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View(profesion);
         }
 
@@ -139,8 +122,7 @@ namespace personapi_dotnet.Controllers
                 return NotFound();
             }
 
-            var profesion = await _context.Profesions
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var profesion = await _profesionRepository.GetByIdAsync(id.Value);
             if (profesion == null)
             {
                 return NotFound();
@@ -154,35 +136,8 @@ namespace personapi_dotnet.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            // Encontrar la profesión por su ID
-            var profesion = await _context.Profesions.FindAsync(id);
-            if (profesion != null)
-            {
-                // Buscar todos los estudios asociados con esta profesión
-                var estudiosAsociados = await _context.Estudios
-                    .Where(e => e.IdProf == id)
-                    .ToListAsync();
-
-                // Eliminar todos los estudios asociados
-                if (estudiosAsociados.Any())
-                {
-                    _context.Estudios.RemoveRange(estudiosAsociados);
-                }
-
-                // Luego eliminar la profesión
-                _context.Profesions.Remove(profesion);
-
-                // Guardar cambios
-                await _context.SaveChangesAsync();
-            }
-
+            await _profesionRepository.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
-        }
-
-
-        private bool ProfesionExists(int id)
-        {
-            return _context.Profesions.Any(e => e.Id == id);
         }
     }
 }

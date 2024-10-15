@@ -2,44 +2,52 @@
 using personapi_dotnet.Interfaces;
 using personapi_dotnet.Models.Entities;
 
-public class ProfesionRepository : IProfesionRepository
+namespace personapi_dotnet.Repositories
 {
-    private readonly PersonaDbContext _context;
-
-    public ProfesionRepository(PersonaDbContext context)
+    public class ProfesionRepository : IProfesionRepository
     {
-        _context = context;
-    }
+        private readonly PersonaDbContext _context;
 
-    public async Task<IEnumerable<Profesion>> GetAllAsync()
-    {
-        return await _context.Profesions.ToListAsync();
-    }
-
-    public async Task<Profesion?> GetByIdAsync(int id)
-    {
-        return await _context.Profesions.FirstOrDefaultAsync(p => p.Id == id);
-    }
-
-    public async Task AddAsync(Profesion profesion)
-    {
-        await _context.Profesions.AddAsync(profesion);
-        await _context.SaveChangesAsync();
-    }
-
-    public async Task UpdateAsync(Profesion profesion)
-    {
-        _context.Profesions.Update(profesion);
-        await _context.SaveChangesAsync();
-    }
-
-    public async Task DeleteAsync(int id)
-    {
-        var profesion = await _context.Profesions.FirstOrDefaultAsync(p => p.Id == id);
-        if (profesion != null)
+        public ProfesionRepository(PersonaDbContext context)
         {
-            _context.Profesions.Remove(profesion);
+            _context = context;
+        }
+
+        public async Task<IEnumerable<Profesion>> GetAllAsync()
+        {
+            return await _context.Profesions.ToListAsync();
+        }
+
+        public async Task<Profesion?> GetByIdAsync(int id)
+        {
+            return await _context.Profesions.FindAsync(id);
+        }
+
+        public async Task AddAsync(Profesion profesion)
+        {
+            await _context.Profesions.AddAsync(profesion);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateAsync(Profesion profesion)
+        {
+            _context.Profesions.Update(profesion);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var profesion = await _context.Profesions.FindAsync(id);
+            if (profesion != null)
+            {
+                _context.Profesions.Remove(profesion);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<bool> ProfesionExistsAsync(int id)
+        {
+            return await _context.Profesions.AnyAsync(p => p.Id == id);
         }
     }
 }

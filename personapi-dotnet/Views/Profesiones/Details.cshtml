@@ -4,27 +4,23 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h1>Profesion Details</h1>
+                <a asp-action="Index" class="btn btn-link" title="Back to List">
+                    <i class="bi bi-arrow-left-circle" style="font-size: 1.5rem;"></i>
+                </a>
+            </div>
 
-<div>
-    <h4>Profesion</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Nom)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Nom)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Des)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Des)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+            <dl class="row my-4">
+                <dt class="col-sm-2">@Html.DisplayNameFor(model => model.Nom)</dt>
+                <dd class="col-sm-10">@Html.DisplayFor(model => model.Nom)</dd>
+
+                <dt class="col-sm-2">@Html.DisplayNameFor(model => model.Des)</dt>
+                <dd class="col-sm-10">@Html.DisplayFor(model => model.Des)</dd>
+            </dl>
+        </div>
+    </div>
 </div>

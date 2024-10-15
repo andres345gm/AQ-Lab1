@@ -49,5 +49,10 @@ namespace personapi_dotnet.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<bool> TelefonoExistsAsync(string numero)
+        {
+            return await _context.Telefonos.AnyAsync(t => t.Num == numero);
+        }
     }
 }
