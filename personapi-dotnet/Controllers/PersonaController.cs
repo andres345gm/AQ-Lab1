@@ -4,52 +4,80 @@ using personapi_dotnet.Models.Entities;
 
 namespace personapi_dotnet.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class PersonaController : ControllerBase
+    public class PersonaController : Controller
     {
-        private readonly IPersonaRepository _repository;
+        private readonly IPersonaRepository _personaRepository;
 
-        public PersonaController(IPersonaRepository repository)
+        public PersonaController(IPersonaRepository personaRepository)
         {
-            _repository = repository;
+            _personaRepository = personaRepository;
         }
 
-        [HttpGet]
-        public IActionResult GetAll()
+        // GET: Persona
+        public IActionResult Index()
         {
-            var personas = _repository.GetAll();
-            return Ok(personas);
+            var personas = _personaRepository.GetAll();
+            return View(personas);
         }
 
-        [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        // GET: Persona/Create
+        public IActionResult Create()
         {
-            var persona = _repository.GetById(id);
-            if (persona == null) return NotFound();
-            return Ok(persona);
+            return View();
         }
 
+        // POST: Persona/Create
         [HttpPost]
-        public IActionResult Add([FromBody] Persona persona)
+        public async Task<IActionResult> Create(Persona persona)
         {
-            _repository.Add(persona);
-            return CreatedAtAction(nameof(GetById), new { id = persona.Cc }, persona);
+            if (ModelState.IsValid)
+            {
+                await _personaRepository.Add(persona);
+                return RedirectToAction(nameof(Index));
+            }
+            return View(persona);
         }
 
-        [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] Persona persona)
+        // GET: Persona/Edit/{cc}
+        public IActionResult Edit(int cc)
         {
-            if (id != persona.Cc) return BadRequest();
-            _repository.Update(persona);
-            return NoContent();
+            var persona = _personaRepository.GetById(cc);
+            if (persona == null)
+            {
+                return NotFound();
+            }
+            return View(persona);
         }
 
-        [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        // POST: Persona/Edit/{cc}
+        [HttpPost]
+        public async Task<IActionResult> Edit(Persona persona)
         {
-            _repository.Delete(id);
-            return NoContent();
+            if (ModelState.IsValid)
+            {
+                await _personaRepository.Update(persona);
+                return RedirectToAction(nameof(Index));
+            }
+            return View(persona);
+        }
+
+        // GET: Persona/Delete/{cc}
+        public IActionResult Delete(int cc)
+        {
+            var persona = _personaRepository.GetById(cc);
+            if (persona == null)
+            {
+                return NotFound();
+            }
+            return View(persona);
+        }
+
+        // POST: Persona/DeleteConfirmed/{cc}
+        [HttpPost, ActionName("Delete")]
+        public async Task<IActionResult> DeleteConfirmed(int cc)
+        {
+            await _personaRepository.Delete(cc);
+            return RedirectToAction(nameof(Index));
         }
     }
 }

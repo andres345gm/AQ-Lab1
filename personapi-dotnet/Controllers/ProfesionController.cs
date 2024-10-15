@@ -4,52 +4,80 @@ using personapi_dotnet.Models.Entities;
 
 namespace personapi_dotnet.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class ProfesionController : ControllerBase
+    public class ProfesionController : Controller
     {
-        private readonly IProfesionRepository _repository;
+        private readonly IProfesionRepository _profesionRepository;
 
-        public ProfesionController(IProfesionRepository repository)
+        public ProfesionController(IProfesionRepository profesionRepository)
         {
-            _repository = repository;
+            _profesionRepository = profesionRepository;
         }
 
-        [HttpGet]
-        public IActionResult GetAll()
+        // GET: Profesion
+        public IActionResult Index()
         {
-            var profesions = _repository.GetAll();
-            return Ok(profesions);
+            var profesiones = _profesionRepository.GetAll();
+            return View(profesiones);
         }
 
-        [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        // GET: Profesion/Create
+        public IActionResult Create()
         {
-            var profesion = _repository.GetById(id);
-            if (profesion == null) return NotFound();
-            return Ok(profesion);
+            return View();
         }
 
+        // POST: Profesion/Create
         [HttpPost]
-        public IActionResult Add([FromBody] Profesion profesion)
+        public async Task<IActionResult> Create(Profesion profesion)
         {
-            _repository.Add(profesion);
-            return CreatedAtAction(nameof(GetById), new { id = profesion.Id }, profesion);
+            if (ModelState.IsValid)
+            {
+                await _profesionRepository.Add(profesion);
+                return RedirectToAction(nameof(Index));
+            }
+            return View(profesion);
         }
 
-        [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] Profesion profesion)
+        // GET: Profesion/Edit/{id}
+        public IActionResult Edit(int id)
         {
-            if (id != profesion.Id) return BadRequest();
-            _repository.Update(profesion);
-            return NoContent();
+            var profesion = _profesionRepository.GetById(id);
+            if (profesion == null)
+            {
+                return NotFound();
+            }
+            return View(profesion);
         }
 
-        [HttpDelete("{id}")]
+        // POST: Profesion/Edit/{id}
+        [HttpPost]
+        public async Task<IActionResult> Edit(Profesion profesion)
+        {
+            if (ModelState.IsValid)
+            {
+                await _profesionRepository.Update(profesion);
+                return RedirectToAction(nameof(Index));
+            }
+            return View(profesion);
+        }
+
+        // GET: Profesion/Delete/{id}
         public IActionResult Delete(int id)
         {
-            _repository.Delete(id);
-            return NoContent();
+            var profesion = _profesionRepository.GetById(id);
+            if (profesion == null)
+            {
+                return NotFound();
+            }
+            return View(profesion);
+        }
+
+        // POST: Profesion/DeleteConfirmed/{id}
+        [HttpPost, ActionName("Delete")]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            await _profesionRepository.Delete(id);
+            return RedirectToAction(nameof(Index));
         }
     }
 }

@@ -4,52 +4,94 @@ using personapi_dotnet.Models.Entities;
 
 namespace personapi_dotnet.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class EstudioController : ControllerBase
+    public class EstudioController : Controller
     {
-        private readonly IEstudioRepository _repository;
+        private readonly IEstudioRepository _estudioRepository;
+        private readonly IPersonaRepository _personaRepository; // Para obtener información de persona
+        private readonly IProfesionRepository _profesionRepository; // Para obtener información de profesion
 
-        public EstudioController(IEstudioRepository repository)
+        public EstudioController(IEstudioRepository estudioRepository, IPersonaRepository personaRepository, IProfesionRepository profesionRepository)
         {
-            _repository = repository;
+            _estudioRepository = estudioRepository;
+            _personaRepository = personaRepository;
+            _profesionRepository = profesionRepository;
         }
 
-        [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> Index()
         {
-            var estudios = _repository.GetAll();
-            return Ok(estudios);
+            var estudios = _estudioRepository.GetAll();
+            return View(estudios);
         }
 
-        [HttpGet("{idProf}/{ccPer}")]
-        public IActionResult GetById(int idProf, int ccPer)
+        public IActionResult Create()
         {
-            var estudio = _repository.GetById(idProf, ccPer);
-            if (estudio == null) return NotFound();
-            return Ok(estudio);
+            ViewBag.Personas = _personaRepository.GetAll(); // Lista de personas
+            ViewBag.Profesiones = _profesionRepository.GetAll(); // Lista de profesiones
+            return View();
         }
 
         [HttpPost]
-        public IActionResult Add([FromBody] Estudio estudio)
+        public async Task<IActionResult> Create(Estudio estudio)
         {
-            _repository.Add(estudio);
-            return CreatedAtAction(nameof(GetById), new { idProf = estudio.IdProf, ccPer = estudio.CcPer }, estudio);
+            if (ModelState.IsValid)
+            {
+                await _estudioRepository.Add(estudio);
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Si el modelo no es válido, vuelve a cargar las listas
+            ViewBag.Personas = _personaRepository.GetAll();
+            ViewBag.Profesiones = _profesionRepository.GetAll();
+            return View(estudio);
         }
 
-        [HttpPut("{idProf}/{ccPer}")]
-        public IActionResult Update(int idProf, int ccPer, [FromBody] Estudio estudio)
+        public IActionResult Edit(int id_prof, int cc_per)
         {
-            if (idProf != estudio.IdProf || ccPer != estudio.CcPer) return BadRequest();
-            _repository.Update(estudio);
-            return NoContent();
+            var estudio = _estudioRepository.GetById(id_prof, cc_per);
+            if (estudio == null)
+            {
+                return NotFound();
+            }
+
+            ViewBag.Personas = _personaRepository.GetAll(); // Lista de personas
+            ViewBag.Profesiones = _profesionRepository.GetAll(); // Lista de profesiones
+            return View(estudio);
         }
 
-        [HttpDelete("{idProf}/{ccPer}")]
-        public IActionResult Delete(int idProf, int ccPer)
+        [HttpPost]
+        public async Task<IActionResult> Edit(Estudio estudio)
         {
-            _repository.Delete(idProf, ccPer);
-            return NoContent();
+            if (ModelState.IsValid)
+            {
+                await _estudioRepository.Update(estudio);
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Si el modelo no es válido, vuelve a cargar las listas
+            ViewBag.Personas = _personaRepository.GetAll();
+            ViewBag.Profesiones = _profesionRepository.GetAll();
+            return View(estudio);
+        }
+
+        public async Task<IActionResult> Delete(int id_prof, int cc_per)
+        {
+            var estudio = _estudioRepository.GetById(id_prof, cc_per);
+            if (estudio == null)
+            {
+                return NotFound();
+            }
+            return View(estudio);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        public async Task<IActionResult> DeleteConfirmed(int id_prof, int cc_per)
+        {
+            var success = await _estudioRepository.Delete(id_prof, cc_per);
+            if (!success)
+            {
+                return NotFound();
+            }
+            return RedirectToAction(nameof(Index));
         }
     }
 }

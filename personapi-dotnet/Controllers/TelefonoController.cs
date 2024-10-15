@@ -4,52 +4,80 @@ using personapi_dotnet.Models.Entities;
 
 namespace personapi_dotnet.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class TelefonoController : ControllerBase
+    public class TelefonoController : Controller
     {
-        private readonly ITelefonoRepository _repository;
+        private readonly ITelefonoRepository _telefonoRepository;
 
-        public TelefonoController(ITelefonoRepository repository)
+        public TelefonoController(ITelefonoRepository telefonoRepository)
         {
-            _repository = repository;
+            _telefonoRepository = telefonoRepository;
         }
 
-        [HttpGet]
-        public IActionResult GetAll()
+        // GET: Telefono
+        public IActionResult Index()
         {
-            var telefonos = _repository.GetAll();
-            return Ok(telefonos);
+            var telefonos = _telefonoRepository.GetAll();
+            return View(telefonos);
         }
 
-        [HttpGet("{num}")]
-        public IActionResult GetById(string num)
+        // GET: Telefono/Create
+        public IActionResult Create()
         {
-            var telefono = _repository.GetById(num);
-            if (telefono == null) return NotFound();
-            return Ok(telefono);
+            return View();
         }
 
+        // POST: Telefono/Create
         [HttpPost]
-        public IActionResult Add([FromBody] Telefono telefono)
+        public async Task<IActionResult> Create(Telefono telefono)
         {
-            _repository.Add(telefono);
-            return CreatedAtAction(nameof(GetById), new { num = telefono.Num }, telefono);
+            if (ModelState.IsValid)
+            {
+                await _telefonoRepository.Add(telefono);
+                return RedirectToAction(nameof(Index));
+            }
+            return View(telefono);
         }
 
-        [HttpPut("{num}")]
-        public IActionResult Update(string num, [FromBody] Telefono telefono)
+        // GET: Telefono/Edit/{num}
+        public IActionResult Edit(string num)
         {
-            if (num != telefono.Num) return BadRequest();
-            _repository.Update(telefono);
-            return NoContent();
+            var telefono = _telefonoRepository.GetById(num);
+            if (telefono == null)
+            {
+                return NotFound();
+            }
+            return View(telefono);
         }
 
-        [HttpDelete("{num}")]
+        // POST: Telefono/Edit/{num}
+        [HttpPost]
+        public async Task<IActionResult> Edit(Telefono telefono)
+        {
+            if (ModelState.IsValid)
+            {
+                await _telefonoRepository.Update(telefono);
+                return RedirectToAction(nameof(Index));
+            }
+            return View(telefono);
+        }
+
+        // GET: Telefono/Delete/{num}
         public IActionResult Delete(string num)
         {
-            _repository.Delete(num);
-            return NoContent();
+            var telefono = _telefonoRepository.GetById(num);
+            if (telefono == null)
+            {
+                return NotFound();
+            }
+            return View(telefono);
+        }
+
+        // POST: Telefono/DeleteConfirmed/{num}
+        [HttpPost, ActionName("Delete")]
+        public async Task<IActionResult> DeleteConfirmed(string num)
+        {
+            await _telefonoRepository.Delete(num);
+            return RedirectToAction(nameof(Index));
         }
     }
 }
