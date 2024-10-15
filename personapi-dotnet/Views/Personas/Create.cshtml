@@ -35,9 +35,12 @@
                     <span asp-validation-for="Apellido" class="text-danger"></span>
                 </div>
 
-                <div class="form-floating mb-3">
-                    <input asp-for="Genero" class="form-control shadow-sm" placeholder="Genero" />
-                    <label asp-for="Genero">Género</label>
+                <div class="form-group mb-3">
+                    <label asp-for="Genero" class="form-label"></label>
+                    <select asp-for="Genero" class="form-control">
+                        <option value="M">M</option>
+                        <option value="F">F</option>
+                    </select>
                     <span asp-validation-for="Genero" class="text-danger"></span>
                 </div>
 
