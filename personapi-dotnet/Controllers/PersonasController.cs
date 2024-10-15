@@ -73,7 +73,7 @@ namespace personapi_dotnet.Controllers
             return View(persona);
         }
 
-        // GET: Personas/Edit/5
+        // GET: Personas/Edit/#
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -90,7 +90,7 @@ namespace personapi_dotnet.Controllers
             return View(persona);
         }
 
-        // POST: Personas/Edit/5
+        // POST: Personas/Edit/#
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Cc,Nombre,Apellido,Genero,Edad")] Persona persona)
@@ -123,7 +123,7 @@ namespace personapi_dotnet.Controllers
             return View(persona);
         }
 
-        // GET: Personas/Delete/5
+        // GET: Personas/Delete/#
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -140,7 +140,7 @@ namespace personapi_dotnet.Controllers
             return View(persona);
         }
 
-        // POST: Personas/Delete/5
+        // POST: Personas/Delete/#
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

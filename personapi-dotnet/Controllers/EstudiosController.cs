@@ -27,7 +27,7 @@ namespace personapi_dotnet.Controllers
             return View(estudios);
         }
 
-        // GET: Estudios/Details/5
+        // GET: Estudios/Details/#
         public async Task<IActionResult> Details(int? idProf, int? ccPer)
         {
             if (idProf == null || ccPer == null)
@@ -86,7 +86,7 @@ namespace personapi_dotnet.Controllers
             return View(estudio);
         }
 
-        // GET: Estudios/Edit/5
+        // GET: Estudios/Edit/#
         public async Task<IActionResult> Edit(int? idProf, int? ccPer)
         {
             if (idProf == null || ccPer == null)
@@ -105,7 +105,7 @@ namespace personapi_dotnet.Controllers
             return View(estudio);
         }
 
-        // POST: Estudios/Edit/5
+        // POST: Estudios/Edit/#
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int idProf, int ccPer, [Bind("IdProf,CcPer,Fecha,Univer")] Estudio estudio)
@@ -149,7 +149,7 @@ namespace personapi_dotnet.Controllers
             return View(estudio);
         }
 
-        // GET: Estudios/Delete/5
+        // GET: Estudios/Delete/#
         public async Task<IActionResult> Delete(int? idProf, int? ccPer)
         {
             if (idProf == null || ccPer == null)
@@ -166,7 +166,7 @@ namespace personapi_dotnet.Controllers
             return View(estudio);
         }
 
-        // POST: Estudios/Delete/5
+        // POST: Estudios/Delete/#
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int idProf, int ccPer)

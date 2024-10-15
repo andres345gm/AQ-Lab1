@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using personapi_dotnet.Interfaces;
 using personapi_dotnet.Models.Entities;
+using Microsoft.Extensions.Logging;
 
 namespace personapi_dotnet.Controllers.api
 {
@@ -12,12 +13,14 @@ namespace personapi_dotnet.Controllers.api
         private readonly IPersonaRepository _personaRepository;
         private readonly ITelefonoRepository _telefonoRepository;
         private readonly IEstudioRepository _estudioRepository;
+        private readonly ILogger<APIPersonaController> _logger;
 
-        public APIPersonaController(IPersonaRepository personaRepository, ITelefonoRepository telefonoRepository, IEstudioRepository estudioRepository)
+        public APIPersonaController(IPersonaRepository personaRepository, ITelefonoRepository telefonoRepository, IEstudioRepository estudioRepository, ILogger<APIPersonaController> logger)
         {
             _personaRepository = personaRepository;
             _telefonoRepository = telefonoRepository;
             _estudioRepository = estudioRepository;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -104,7 +107,8 @@ namespace personapi_dotnet.Controllers.api
             }
             catch (Exception ex)
             {
-                // Handle exception
+                _logger.LogError(ex, $"Error deleting phone numbers for persona with ID {id}");
+                return StatusCode(500, "An error occurred while deleting phone numbers.");
             }
 
             try
@@ -118,12 +122,22 @@ namespace personapi_dotnet.Controllers.api
                     }
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                // Handle exception
+                _logger.LogError(ex, $"Error deleting studies for persona with ID {id}");
+                return StatusCode(500, "An error occurred while deleting studies.");
             }
 
-            await _personaRepository.DeleteAsync(id);
+            try
+            {
+                await _personaRepository.DeleteAsync(id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error deleting persona with ID {id}");
+                return StatusCode(500, "An error occurred while deleting the persona.");
+            }
+
             return NoContent();
         }
     }
