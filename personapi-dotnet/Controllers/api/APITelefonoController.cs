@@ -1,9 +1,8 @@
-﻿using System.Text.Json.Serialization;
-using System.Text.Json;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using personapi_dotnet.Interfaces;
 using personapi_dotnet.Models.Entities;
-using personapi_dotnet.Repositories;
 
 namespace personapi_dotnet.Controllers.api
 {
@@ -12,7 +11,6 @@ namespace personapi_dotnet.Controllers.api
     public class APITelefonoController : ControllerBase
     {
         private readonly ITelefonoRepository _telefonoRepository;
-
         private readonly IPersonaRepository _personaRepository;
 
         public APITelefonoController(ITelefonoRepository telefonoRepository, IPersonaRepository personaRepository)
@@ -22,16 +20,16 @@ namespace personapi_dotnet.Controllers.api
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            var telefonos = _telefonoRepository.GetAll();
+            var telefonos = await _telefonoRepository.GetAllAsync();
             return Ok(telefonos);
         }
 
         [HttpGet("{numero}")]
-        public IActionResult GetByNumber(string numero)
+        public async Task<IActionResult> GetByNumber(string numero)
         {
-            var telefono = _telefonoRepository.GetByNumber(numero);
+            var telefono = await _telefonoRepository.GetByNumberAsync(numero);
             if (telefono == null)
             {
                 return NotFound();
@@ -40,16 +38,14 @@ namespace personapi_dotnet.Controllers.api
         }
 
         [HttpPost]
-        public IActionResult Create(string numero, string operador, int duenioCedula)
+        public async Task<IActionResult> Create(string numero, string operador, int duenioCedula)
         {
-            // Verificar si la persona con la cédula proporcionada existe
-            var persona = _personaRepository.GetById(duenioCedula);
+            var persona = await _personaRepository.GetByIdAsync(duenioCedula);
             if (persona == null)
             {
                 return BadRequest("La persona con la cédula proporcionada no existe.");
             }
 
-            // Crear un nuevo objeto de teléfono y asignar los valores
             var telefono = new Telefono
             {
                 Num = numero,
@@ -57,48 +53,38 @@ namespace personapi_dotnet.Controllers.api
                 Duenio = duenioCedula
             };
 
-            // Agregar el teléfono a la persona correspondiente
             persona.Telefonos.Add(telefono);
-            _personaRepository.Update(persona);
+            await _personaRepository.UpdateAsync(persona);
 
-            // Configurar las opciones de serialización para evitar ciclos de referencias
             var options = new JsonSerializerOptions
             {
                 ReferenceHandler = ReferenceHandler.Preserve
             };
 
-            // Serializar el teléfono con las opciones configuradas
             var serializedTelefono = JsonSerializer.Serialize(telefono, options);
 
             return CreatedAtAction(nameof(GetByNumber), new { numero = telefono.Num }, serializedTelefono);
         }
 
-
         [HttpPut("{numero}")]
-        public IActionResult Update(string numero, string oper)
+        public async Task<IActionResult> Update(string numero, string oper)
         {
-            // Obtener el teléfono existente de la base de datos
-            var existingTelefono = _telefonoRepository.GetByNumber(numero);
+            var existingTelefono = await _telefonoRepository.GetByNumberAsync(numero);
             if (existingTelefono == null)
             {
                 return NotFound();
             }
 
-            // Actualizar el valor de 'oper' del teléfono existente con el valor recibido en la solicitud
             existingTelefono.Oper = oper;
-
-            // Guardar los cambios en la base de datos
-            _telefonoRepository.Update(existingTelefono);
+            await _telefonoRepository.UpdateAsync(existingTelefono);
 
             return NoContent();
         }
 
-
-
         [HttpDelete("{numero}")]
-        public IActionResult Delete(string numero)
+        public async Task<IActionResult> Delete(string numero)
         {
-            _telefonoRepository.Delete(numero);
+            await _telefonoRepository.DeleteAsync(numero);
             return NoContent();
         }
     }

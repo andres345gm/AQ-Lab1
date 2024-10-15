@@ -1,4 +1,5 @@
-﻿using personapi_dotnet.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using personapi_dotnet.Interfaces;
 using personapi_dotnet.Models.Entities;
 
 public class ProfesionRepository : IProfesionRepository
@@ -10,41 +11,35 @@ public class ProfesionRepository : IProfesionRepository
         _context = context;
     }
 
-    public IEnumerable<Profesion> GetAll()
+    public async Task<IEnumerable<Profesion>> GetAllAsync()
     {
-        return _context.Profesions.ToList();
+        return await _context.Profesions.ToListAsync();
     }
 
-    public Profesion? GetById(int id)
+    public async Task<Profesion?> GetByIdAsync(int id)
     {
-        var profesion = _context.Profesions.FirstOrDefault(p => p.Id == id);
-        if (profesion != null)
-        {
-            return profesion;
-        }
-        return null;
+        return await _context.Profesions.FirstOrDefaultAsync(p => p.Id == id);
     }
 
-    public void Add(Profesion profesion)
+    public async Task AddAsync(Profesion profesion)
     {
-        _context.Profesions.Add(profesion);
-        _context.SaveChanges();
+        await _context.Profesions.AddAsync(profesion);
+        await _context.SaveChangesAsync();
     }
 
-    public void Update(Profesion profesion)
+    public async Task UpdateAsync(Profesion profesion)
     {
         _context.Profesions.Update(profesion);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
     }
 
-    public void Delete(int id)
+    public async Task DeleteAsync(int id)
     {
-        var profesion = _context.Profesions.FirstOrDefault(p => p.Id == id);
+        var profesion = await _context.Profesions.FirstOrDefaultAsync(p => p.Id == id);
         if (profesion != null)
         {
             _context.Profesions.Remove(profesion);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
-
 }

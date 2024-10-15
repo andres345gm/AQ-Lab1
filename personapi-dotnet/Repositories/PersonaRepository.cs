@@ -1,4 +1,5 @@
-﻿using personapi_dotnet.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using personapi_dotnet.Interfaces;
 using personapi_dotnet.Models.Entities;
 
 namespace personapi_dotnet.Repositories
@@ -12,40 +13,35 @@ namespace personapi_dotnet.Repositories
             _context = context;
         }
 
-        public IEnumerable<Persona> GetAll()
+        public async Task<IEnumerable<Persona>> GetAllAsync()
         {
-            return _context.Personas.ToList();
+            return await _context.Personas.ToListAsync();
         }
 
-        public Persona? GetById(int id)
+        public async Task<Persona?> GetByIdAsync(int id)
         {
-            var persona = _context.Personas.FirstOrDefault(p => p.Cc == id);
-            if (persona != null)
-            {
-                return persona;
-            }
-            return null;
+            return await _context.Personas.FirstOrDefaultAsync(p => p.Cc == id);
         }
 
-        public void Add(Persona persona)
+        public async Task AddAsync(Persona persona)
         {
-            _context.Personas.Add(persona);
-            _context.SaveChanges();
+            await _context.Personas.AddAsync(persona);
+            await _context.SaveChangesAsync();
         }
 
-        public void Update(Persona persona)
+        public async Task UpdateAsync(Persona persona)
         {
             _context.Personas.Update(persona);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public void Delete(int id)
+        public async Task DeleteAsync(int id)
         {
-            var persona = _context.Personas.FirstOrDefault(p => p.Cc == id);
+            var persona = await _context.Personas.FirstOrDefaultAsync(p => p.Cc == id);
             if (persona != null)
             {
                 _context.Personas.Remove(persona);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
         }
     }

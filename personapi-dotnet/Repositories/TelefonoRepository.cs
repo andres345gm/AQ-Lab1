@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.EntityFrameworkCore;
 using personapi_dotnet.Interfaces;
 using personapi_dotnet.Models.Entities;
 
@@ -13,52 +13,41 @@ namespace personapi_dotnet.Repositories
             _context = context;
         }
 
-        public IEnumerable<Telefono> GetAll()
+        public async Task<IEnumerable<Telefono>> GetAllAsync()
         {
-            return _context.Telefonos.ToList();
+            return await _context.Telefonos.ToListAsync();
         }
 
-        public Telefono? GetByNumber(string numero)
+        public async Task<Telefono?> GetByNumberAsync(string numero)
         {
-            var telefono = _context.Telefonos.FirstOrDefault(t => t.Num == numero);
-            if (telefono != null)
-            {
-                return telefono;
-            }
-            return null;
+            return await _context.Telefonos.FirstOrDefaultAsync(t => t.Num == numero);
         }
 
-        public IEnumerable<Telefono> GetByDuenio(int id)
+        public async Task<IEnumerable<Telefono>> GetByDuenioAsync(int id)
         {
-            var telefonos = _context.Telefonos.Where(t => t.Duenio == id);
-            if (telefonos.Any())
-            {
-                return telefonos;
-            }
-            return null;
+            return await _context.Telefonos.Where(t => t.Duenio == id).ToListAsync();
         }
 
-        public void Add(Telefono telefono)
+        public async Task AddAsync(Telefono telefono)
         {
-            _context.Telefonos.Add(telefono);
-            _context.SaveChanges();
+            await _context.Telefonos.AddAsync(telefono);
+            await _context.SaveChangesAsync();
         }
 
-        public void Update(Telefono telefono)
+        public async Task UpdateAsync(Telefono telefono)
         {
             _context.Telefonos.Update(telefono);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public void Delete(string numero)
+        public async Task DeleteAsync(string numero)
         {
-            var telefono = _context.Telefonos.FirstOrDefault(t => t.Num == numero);
+            var telefono = await _context.Telefonos.FirstOrDefaultAsync(t => t.Num == numero);
             if (telefono != null)
             {
                 _context.Telefonos.Remove(telefono);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
         }
     }
-
 }

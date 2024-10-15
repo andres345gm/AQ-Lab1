@@ -4,12 +4,12 @@ namespace personapi_dotnet.Interfaces
 {
     public interface IEstudioRepository
     {
-        IEnumerable<Estudio> GetAll();
-        Estudio? GetById(int ccPer, int idProf);
-        IEnumerable<Estudio> GetAllByIdProf(int idProf);
-        IEnumerable<Estudio> GetAllByCcPer(int CcPer);
-        void Add(Estudio estudio);
-        void Update(Estudio estudio);
-        void Delete(int ccPer, int idprof);
+        Task<IEnumerable<Estudio>> GetAllAsync();
+        Task<Estudio?> GetByIdAsync(int ccPer, int idProf);
+        Task<IEnumerable<Estudio>> GetAllByIdProfAsync(int idProf);  // Método asincrónico añadido
+        Task<IEnumerable<Estudio>> GetAllByCcPerAsync(int ccPer);    // Método asincrónico añadido
+        Task AddAsync(Estudio estudio);
+        Task UpdateAsync(Estudio estudio);
+        Task DeleteAsync(int ccPer, int idProf);
     }
 }

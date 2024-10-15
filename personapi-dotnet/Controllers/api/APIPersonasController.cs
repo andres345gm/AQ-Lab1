@@ -1,12 +1,9 @@
-﻿using System.Runtime.ConstrainedExecution;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using personapi_dotnet.Interfaces;
 using personapi_dotnet.Models.Entities;
-using personapi_dotnet.Repositories;
 
 namespace personapi_dotnet.Controllers.api
 {
-
     [Produces("application/json")]
     [Route("api/personas")]
     [ApiController]
@@ -24,16 +21,16 @@ namespace personapi_dotnet.Controllers.api
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            var personas = _personaRepository.GetAll();
+            var personas = await _personaRepository.GetAllAsync();
             return Ok(personas);
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            var persona = _personaRepository.GetById(id);
+            var persona = await _personaRepository.GetByIdAsync(id);
             if (persona == null)
             {
                 return NotFound();
@@ -42,7 +39,7 @@ namespace personapi_dotnet.Controllers.api
         }
 
         [HttpPost]
-        public IActionResult Create(int cc, string nombre, string apellido, string genero, int edad)
+        public async Task<IActionResult> Create(int cc, string nombre, string apellido, string genero, int edad)
         {
             var persona = new Persona
             {
@@ -52,16 +49,16 @@ namespace personapi_dotnet.Controllers.api
                 Genero = genero,
                 Edad = edad,
             };
-            _personaRepository.Add(persona);
+            await _personaRepository.AddAsync(persona);
             return CreatedAtAction(nameof(GetById), new { id = persona.Cc }, persona);
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, string nombre = null, string apellido = null, string genero = null, int edad = 0)
+        public async Task<IActionResult> Update(int id, string nombre = null, string apellido = null, string genero = null, int edad = 0)
         {
-            var persona = _personaRepository.GetById(id);
+            var persona = await _personaRepository.GetByIdAsync(id);
 
-            if (id != persona.Cc)
+            if (persona == null || id != persona.Cc)
             {
                 return BadRequest();
             }
@@ -86,49 +83,47 @@ namespace personapi_dotnet.Controllers.api
                 persona.Edad = edad;
             }
 
-            _personaRepository.Update(persona);
+            await _personaRepository.UpdateAsync(persona);
             return NoContent();
         }
 
-
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             try
             {
-                var telefonos = _telefonoRepository.GetByDuenio(id);
+                var telefonos = await _telefonoRepository.GetByDuenioAsync(id);
                 if (telefonos.Any())
                 {
                     List<string> phoneNumbersToDelete = telefonos.Select(t => t.Num).ToList();
                     foreach (var phoneNumber in phoneNumbersToDelete)
                     {
-                        _telefonoRepository.Delete(phoneNumber);
+                        await _telefonoRepository.DeleteAsync(phoneNumber);
                     }
-
                 }
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
-
+                // Handle exception
             }
 
             try
             {
-                var estudios = _estudioRepository.GetAllByCcPer(id);
+                var estudios = await _estudioRepository.GetAllByCcPerAsync(id);
                 if (estudios.Any())
                 {
-                    List<int> studies = estudios.Select(t => t.CcPer).ToList();
                     foreach (var estudio in estudios)
                     {
-                        _estudioRepository.Delete(estudio.CcPer, estudio.IdProf);
+                        await _estudioRepository.DeleteAsync(estudio.CcPer, estudio.IdProf);
                     }
                 }
-
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
-
+                // Handle exception
             }
 
-            _personaRepository.Delete(id);
+            await _personaRepository.DeleteAsync(id);
             return NoContent();
         }
     }

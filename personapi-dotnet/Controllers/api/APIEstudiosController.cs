@@ -1,11 +1,8 @@
-﻿using System.Runtime.ConstrainedExecution;
-using System.Text.Json.Serialization;
-using System.Text.Json;
-using Microsoft.AspNetCore.Components;
+﻿using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using personapi_dotnet.Interfaces;
 using personapi_dotnet.Models.Entities;
-using RouteAttribute = Microsoft.AspNetCore.Mvc.RouteAttribute;
+using System.Text.Json.Serialization;
 
 namespace personapi_dotnet.Controllers.api
 {
@@ -25,15 +22,16 @@ namespace personapi_dotnet.Controllers.api
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            var estudios = _estudioRepository.GetAll();
+            var estudios = await _estudioRepository.GetAllAsync();
             return Ok(estudios);
         }
+
         [HttpGet("{ccPer}/{idProf}")]
-        public IActionResult GetById(int ccPer, int idProf)
+        public async Task<IActionResult> GetById(int ccPer, int idProf)
         {
-            var estudio = _estudioRepository.GetById(ccPer, idProf);
+            var estudio = await _estudioRepository.GetByIdAsync(ccPer, idProf);
             if (estudio == null)
             {
                 return NotFound();
@@ -42,10 +40,10 @@ namespace personapi_dotnet.Controllers.api
         }
 
         [HttpPost]
-        public IActionResult Create(int id_profesion, int cc_persona, DateOnly date, string universidad)
+        public async Task<IActionResult> Create(int id_profesion, int cc_persona, DateOnly date, string universidad)
         {
             // Verificar si el estudio ya existe
-            var existingEstudio = _estudioRepository.GetById(cc_persona, id_profesion);
+            var existingEstudio = await _estudioRepository.GetByIdAsync(cc_persona, id_profesion);
 
             if (existingEstudio != null)
             {
@@ -62,15 +60,24 @@ namespace personapi_dotnet.Controllers.api
             };
 
             // Agregar el estudio a la lista de estudios de la persona
-            var persona = _personaRepository.GetById(cc_persona);
+            var persona = await _personaRepository.GetByIdAsync(cc_persona);
+            if (persona == null)
+            {
+                return NotFound($"Persona con ID {cc_persona} no encontrada.");
+            }
+
             persona.Estudios.Add(estudio);
-            _personaRepository.Update(persona);
+            await _personaRepository.UpdateAsync(persona);
 
-            // Agregar el estudio a la lista de estudios de la profesion
-            var profesion = _profesionRepository.GetById(id_profesion);
+            // Agregar el estudio a la lista de estudios de la profesión
+            var profesion = await _profesionRepository.GetByIdAsync(id_profesion);
+            if (profesion == null)
+            {
+                return NotFound($"Profesión con ID {id_profesion} no encontrada.");
+            }
+
             profesion.Estudios.Add(estudio);
-            _profesionRepository.Update(profesion);
-
+            await _profesionRepository.UpdateAsync(profesion);
 
             // Configurar las opciones de serialización para evitar ciclos de referencias
             var options = new JsonSerializerOptions
@@ -85,12 +92,11 @@ namespace personapi_dotnet.Controllers.api
             return CreatedAtAction(nameof(GetById), new { ccPer = estudio.CcPer, idProf = estudio.IdProf }, serializedEstudio);
         }
 
-
         [HttpPut("{ccPer}/{idProf}")]
-        public IActionResult Update(int ccPer, int idProf, string universidad, DateOnly date)
+        public async Task<IActionResult> Update(int ccPer, int idProf, string universidad, DateOnly date)
         {
             // Obtener el estudio a actualizar
-            var estudio = _estudioRepository.GetById(ccPer, idProf);
+            var estudio = await _estudioRepository.GetByIdAsync(ccPer, idProf);
 
             // Verificar si el estudio existe
             if (estudio == null)
@@ -111,17 +117,15 @@ namespace personapi_dotnet.Controllers.api
             }
 
             // Actualizar el estudio en el repositorio
-            _estudioRepository.Update(estudio);
+            await _estudioRepository.UpdateAsync(estudio);
 
             return NoContent();
         }
 
-
-
         [HttpDelete("{ccPer}/{idProf}")]
-        public IActionResult Delete(int ccPer, int idProf)
+        public async Task<IActionResult> Delete(int ccPer, int idProf)
         {
-            _estudioRepository.Delete(ccPer, idProf);
+            await _estudioRepository.DeleteAsync(ccPer, idProf);
             return NoContent();
         }
     }

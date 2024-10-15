@@ -4,10 +4,10 @@ namespace personapi_dotnet.Interfaces
 {
     public interface IPersonaRepository
     {
-        IEnumerable<Persona> GetAll();
-        Persona? GetById(int id);
-        void Add(Persona persona);
-        void Update(Persona persona);
-        void Delete(int id);
+        Task<IEnumerable<Persona>> GetAllAsync();
+        Task<Persona?> GetByIdAsync(int id);
+        Task AddAsync(Persona persona);
+        Task UpdateAsync(Persona persona);
+        Task DeleteAsync(int id);
     }
 }

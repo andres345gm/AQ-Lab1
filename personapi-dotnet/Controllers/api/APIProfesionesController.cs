@@ -17,16 +17,16 @@ namespace personapi_dotnet.Controllers.api
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            var profesiones = _profesionRepository.GetAll();
+            var profesiones = await _profesionRepository.GetAllAsync();
             return Ok(profesiones);
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            var profesion = _profesionRepository.GetById(id);
+            var profesion = await _profesionRepository.GetByIdAsync(id);
             if (profesion == null)
             {
                 return NotFound();
@@ -35,79 +35,69 @@ namespace personapi_dotnet.Controllers.api
         }
 
         [HttpPost]
-        public IActionResult Create(Profesion profesion)
+        public async Task<IActionResult> Create(Profesion profesion)
         {
-            _profesionRepository.Add(profesion);
+            await _profesionRepository.AddAsync(profesion);
             return CreatedAtAction(nameof(GetById), new { id = profesion.Id }, profesion);
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, string nombre, string descripcion)
+        public async Task<IActionResult> Update(int id, string nombre, string descripcion)
         {
-            // Obtener la profesión existente de la base de datos
-            var profesion = _profesionRepository.GetById(id);
+            var profesion = await _profesionRepository.GetByIdAsync(id);
             if (profesion == null)
             {
                 return NotFound();
             }
 
-            // Actualizar las propiedades de la profesión existente
-            if(nombre != null)
+            if (nombre != null)
             {
                 profesion.Nom = nombre;
             }
 
-            if(descripcion != null)
+            if (descripcion != null)
             {
                 profesion.Des = descripcion;
             }
 
-            // Guardar los cambios en la base de datos
-            _profesionRepository.Update(profesion);
-
+            await _profesionRepository.UpdateAsync(profesion);
             return NoContent();
         }
 
-
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             try
             {
-                var profesion = _profesionRepository.GetById(id);
+                var profesion = await _profesionRepository.GetByIdAsync(id);
                 if (profesion == null)
                 {
                     return NotFound();
                 }
-            }catch (Exception ex)
-            {
-
             }
-
+            catch (Exception ex)
+            {
+                // Manejar excepción
+            }
 
             try
             {
-
-                var estudios = _estudioRepository.GetAllByIdProf(id);
-
+                var estudios = await _estudioRepository.GetAllByIdProfAsync(id);
                 if (estudios.Any())
                 {
                     foreach (var estudio in estudios)
                     {
-                        _estudioRepository.Delete(estudio.CcPer, estudio.IdProf);
+                        await _estudioRepository.DeleteAsync(estudio.CcPer, estudio.IdProf);
                     }
                 }
-
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
-
+                // Manejar excepción
             }
 
-
-            _profesionRepository.Delete(id);
-
-            return NoContent(); 
+            await _profesionRepository.DeleteAsync(id);
+            return NoContent();
         }
-
     }
 }

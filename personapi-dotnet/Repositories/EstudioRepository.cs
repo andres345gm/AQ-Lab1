@@ -1,4 +1,5 @@
-﻿using personapi_dotnet.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using personapi_dotnet.Interfaces;
 using personapi_dotnet.Models.Entities;
 
 namespace personapi_dotnet.Repositories
@@ -12,60 +13,45 @@ namespace personapi_dotnet.Repositories
             _context = context;
         }
 
-        public IEnumerable<Estudio> GetAll()
+        public async Task<IEnumerable<Estudio>> GetAllAsync()
         {
-            return _context.Estudios.ToList();
-        }
-        public Estudio? GetById(int ccPer, int idProf)
-        {
-            var estudio = _context.Estudios.FirstOrDefault(e => e.CcPer == ccPer && e.IdProf == idProf);
-            if (estudio != null)
-            {
-                return estudio;
-            }
-            return null;
+            return await _context.Estudios.ToListAsync();
         }
 
-        public IEnumerable<Estudio> GetAllByIdProf(int idProf)
+        public async Task<Estudio?> GetByIdAsync(int ccPer, int idProf)
         {
-            var estudios = _context.Estudios.Where(e => e.IdProf == idProf).ToList();
-            if (estudios.Any())
-            {
-                return estudios;
-            }
-            return null;
-            
-        }
-        public IEnumerable<Estudio> GetAllByCcPer(int CcPer)
-        {
-            var estudios = _context.Estudios.Where(e => e.CcPer == CcPer).ToList();
-            if (estudios.Any())
-            {
-                return estudios;
-            }
-            return null;
-
+            return await _context.Estudios.FirstOrDefaultAsync(e => e.CcPer == ccPer && e.IdProf == idProf);
         }
 
-        public void Add(Estudio estudio)
+        public async Task<IEnumerable<Estudio>> GetAllByIdProfAsync(int idProf)
         {
-            _context.Estudios.Add(estudio);
-            _context.SaveChanges();
+            return await _context.Estudios.Where(e => e.IdProf == idProf).ToListAsync();
         }
 
-        public void Update(Estudio estudio)
+        public async Task<IEnumerable<Estudio>> GetAllByCcPerAsync(int ccPer)
+        {
+            return await _context.Estudios.Where(e => e.CcPer == ccPer).ToListAsync();
+        }
+
+        public async Task AddAsync(Estudio estudio)
+        {
+            await _context.Estudios.AddAsync(estudio);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateAsync(Estudio estudio)
         {
             _context.Estudios.Update(estudio);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public void Delete(int ccPer, int idProf)
+        public async Task DeleteAsync(int ccPer, int idProf)
         {
-            var estudio = _context.Estudios.FirstOrDefault(e => e.CcPer == ccPer && e.IdProf == idProf);
+            var estudio = await _context.Estudios.FirstOrDefaultAsync(e => e.CcPer == ccPer && e.IdProf == idProf);
             if (estudio != null)
             {
                 _context.Estudios.Remove(estudio);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
         }
     }
