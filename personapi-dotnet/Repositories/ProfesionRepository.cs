@@ -1,55 +1,50 @@
-﻿using personapi_dotnet.Models.Entities;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using personapi_dotnet.Interfaces;
+﻿using personapi_dotnet.Interfaces;
+using personapi_dotnet.Models.Entities;
 
-namespace personapi_dotnet.Repositories
+public class ProfesionRepository : IProfesionRepository
 {
-    public class ProfesionRepository : IProfesionRepository
+    private readonly PersonaDbContext _context;
+
+    public ProfesionRepository(PersonaDbContext context)
     {
-        private readonly PersonaDbContext _context;
+        _context = context;
+    }
 
-        public ProfesionRepository(PersonaDbContext context)
-        {
-            _context = context;
-        }
+    public IEnumerable<Profesion> GetAll()
+    {
+        return _context.Profesions.ToList();
+    }
 
-        public IEnumerable<Profesion> GetAll()
+    public Profesion? GetById(int id)
+    {
+        var profesion = _context.Profesions.FirstOrDefault(p => p.Id == id);
+        if (profesion != null)
         {
-            // Utiliza la propiedad DbSet de Profesion
-            return _context.Profesions.ToList(); // Asegúrate de usar "Profesions"
-        }
-
-        public Profesion GetById(int id)
-        {
-            return _context.Profesions.Find(id);
-        }
-
-        public async Task<Profesion> Add(Profesion profesion)
-        {
-            await _context.AddAsync(profesion);
-            await _context.SaveChangesAsync();
             return profesion;
         }
+        return null;
+    }
 
-        public async Task<bool> Update(Profesion profesion)
-        {
-            _context.Entry(profesion).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-            return true;
-        }
+    public void Add(Profesion profesion)
+    {
+        _context.Profesions.Add(profesion);
+        _context.SaveChanges();
+    }
 
-        public async Task<bool> Delete(int id)
+    public void Update(Profesion profesion)
+    {
+        _context.Profesions.Update(profesion);
+        _context.SaveChanges();
+    }
+
+    public void Delete(int id)
+    {
+        var profesion = _context.Profesions.FirstOrDefault(p => p.Id == id);
+        if (profesion != null)
         {
-            var profesion = _context.Profesions.Find(id);
-            if (profesion == null)
-            {
-                return false;
-            }
             _context.Profesions.Remove(profesion);
-            await _context.SaveChangesAsync();
-            return true;
+            _context.SaveChanges();
         }
     }
+
 }

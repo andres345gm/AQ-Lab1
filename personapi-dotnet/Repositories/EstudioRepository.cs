@@ -1,9 +1,5 @@
 ﻿using personapi_dotnet.Interfaces;
 using personapi_dotnet.Models.Entities;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
-
 
 namespace personapi_dotnet.Repositories
 {
@@ -20,36 +16,57 @@ namespace personapi_dotnet.Repositories
         {
             return _context.Estudios.ToList();
         }
-
-        public Estudio GetById(int id_prof, int cc_per)
+        public Estudio? GetById(int ccPer, int idProf)
         {
-            return _context.Estudios.Find(id_prof, cc_per);
-        }
-
-        public async Task<Estudio> Add(Estudio estudio)
-        {
-            await _context.Estudios.AddAsync(estudio);
-            await _context.SaveChangesAsync();
-            return estudio;
-        }
-
-        public async Task<bool> Update(Estudio estudio)
-        {
-            _context.Entry(estudio).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-            return true;
-        }
-
-        public async Task<bool> Delete(int id_prof, int cc_per)
-        {
-            var estudio = _context.Estudios.Find(id_prof, cc_per);
-            if (estudio == null)
+            var estudio = _context.Estudios.FirstOrDefault(e => e.CcPer == ccPer && e.IdProf == idProf);
+            if (estudio != null)
             {
-                return false;
+                return estudio;
             }
-            _context.Set<Estudio>().Remove(estudio);
-            await _context.SaveChangesAsync();
-            return true;
+            return null;
+        }
+
+        public IEnumerable<Estudio> GetAllByIdProf(int idProf)
+        {
+            var estudios = _context.Estudios.Where(e => e.IdProf == idProf).ToList();
+            if (estudios.Any())
+            {
+                return estudios;
+            }
+            return null;
+            
+        }
+        public IEnumerable<Estudio> GetAllByCcPer(int CcPer)
+        {
+            var estudios = _context.Estudios.Where(e => e.CcPer == CcPer).ToList();
+            if (estudios.Any())
+            {
+                return estudios;
+            }
+            return null;
+
+        }
+
+        public void Add(Estudio estudio)
+        {
+            _context.Estudios.Add(estudio);
+            _context.SaveChanges();
+        }
+
+        public void Update(Estudio estudio)
+        {
+            _context.Estudios.Update(estudio);
+            _context.SaveChanges();
+        }
+
+        public void Delete(int ccPer, int idProf)
+        {
+            var estudio = _context.Estudios.FirstOrDefault(e => e.CcPer == ccPer && e.IdProf == idProf);
+            if (estudio != null)
+            {
+                _context.Estudios.Remove(estudio);
+                _context.SaveChanges();
+            }
         }
     }
 }

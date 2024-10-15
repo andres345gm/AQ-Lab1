@@ -5,9 +5,9 @@ namespace personapi_dotnet.Interfaces
     public interface IProfesionRepository
     {
         IEnumerable<Profesion> GetAll();
-        Profesion GetById(int id);
-        Task<Profesion> Add(Profesion profesion);
-        Task<bool> Update(Profesion profesion);
-        Task<bool> Delete(int id);
+        Profesion? GetById(int id);
+        void Add(Profesion profesion);
+        void Update(Profesion profesion);
+        void Delete(int id);
     }
 }

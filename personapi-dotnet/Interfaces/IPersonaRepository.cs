@@ -5,9 +5,9 @@ namespace personapi_dotnet.Interfaces
     public interface IPersonaRepository
     {
         IEnumerable<Persona> GetAll();
-        Persona GetById(int cc);
-        Task<Persona> Add(Persona persona);
-        Task<bool> Update(Persona persona);
-        Task<bool> Delete(int cc);
+        Persona? GetById(int id);
+        void Add(Persona persona);
+        void Update(Persona persona);
+        void Delete(int id);
     }
 }

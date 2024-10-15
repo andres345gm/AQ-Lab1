@@ -1,8 +1,5 @@
-using Microsoft.EntityFrameworkCore;
-using personapi_dotnet.Interfaces;
+﻿using personapi_dotnet.Interfaces;
 using personapi_dotnet.Models.Entities;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace personapi_dotnet.Repositories
 {
@@ -20,35 +17,36 @@ namespace personapi_dotnet.Repositories
             return _context.Personas.ToList();
         }
 
-        public Persona GetById(int cc)
+        public Persona? GetById(int id)
         {
-            return _context.Personas.Find(cc);
-        }
-
-        public async Task<Persona> Add(Persona persona)
-        {
-            await _context.Personas.AddAsync(persona);
-            await _context.SaveChangesAsync();
-            return persona;
-        }
-
-        public async Task<bool> Update(Persona persona)
-        {
-            _context.Entry(persona).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-            return true;
-        }
-
-        public async Task<bool> Delete(int cc)
-        {
-            var persona = _context.Personas.Find(cc);
-            if (persona == null)
+            var persona = _context.Personas.FirstOrDefault(p => p.Cc == id);
+            if (persona != null)
             {
-                return false;
+                return persona;
             }
-            _context.Set<Persona>().Remove(persona);
-            await _context.SaveChangesAsync();
-            return true;
+            return null;
+        }
+
+        public void Add(Persona persona)
+        {
+            _context.Personas.Add(persona);
+            _context.SaveChanges();
+        }
+
+        public void Update(Persona persona)
+        {
+            _context.Personas.Update(persona);
+            _context.SaveChanges();
+        }
+
+        public void Delete(int id)
+        {
+            var persona = _context.Personas.FirstOrDefault(p => p.Cc == id);
+            if (persona != null)
+            {
+                _context.Personas.Remove(persona);
+                _context.SaveChanges();
+            }
         }
     }
 }

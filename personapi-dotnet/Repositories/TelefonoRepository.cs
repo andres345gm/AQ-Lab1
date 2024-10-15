@@ -1,9 +1,6 @@
-﻿using personapi_dotnet.Interfaces;
+﻿using Microsoft.AspNetCore.Mvc;
+using personapi_dotnet.Interfaces;
 using personapi_dotnet.Models.Entities;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
-
 
 namespace personapi_dotnet.Repositories
 {
@@ -21,34 +18,47 @@ namespace personapi_dotnet.Repositories
             return _context.Telefonos.ToList();
         }
 
-        public Telefono GetById(string num)
+        public Telefono? GetByNumber(string numero)
         {
-            return _context.Telefonos.Find(num);
-        }
-
-        public async Task<Telefono> Add(Telefono telefono)
-        {
-            await _context.Telefonos.AddAsync(telefono);
-            await _context.SaveChangesAsync();
-            return telefono;
-        }
-
-        public async Task<bool> Update(Telefono telefono)
-        {
-            _context.Entry(telefono).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-            return true;
-        }
-
-        public async Task<bool> Delete(string num)
-        {
-            var telefono = _context.Telefonos.Find(num);
-            if (telefono == null) {
-                return false;
+            var telefono = _context.Telefonos.FirstOrDefault(t => t.Num == numero);
+            if (telefono != null)
+            {
+                return telefono;
             }
-            _context.Set<Telefono>().Remove(telefono);
-            await _context.SaveChangesAsync();
-            return true;
+            return null;
+        }
+
+        public IEnumerable<Telefono> GetByDuenio(int id)
+        {
+            var telefonos = _context.Telefonos.Where(t => t.Duenio == id);
+            if (telefonos.Any())
+            {
+                return telefonos;
+            }
+            return null;
+        }
+
+        public void Add(Telefono telefono)
+        {
+            _context.Telefonos.Add(telefono);
+            _context.SaveChanges();
+        }
+
+        public void Update(Telefono telefono)
+        {
+            _context.Telefonos.Update(telefono);
+            _context.SaveChanges();
+        }
+
+        public void Delete(string numero)
+        {
+            var telefono = _context.Telefonos.FirstOrDefault(t => t.Num == numero);
+            if (telefono != null)
+            {
+                _context.Telefonos.Remove(telefono);
+                _context.SaveChanges();
+            }
         }
     }
+
 }

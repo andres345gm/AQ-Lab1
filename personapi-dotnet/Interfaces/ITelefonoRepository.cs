@@ -5,9 +5,11 @@ namespace personapi_dotnet.Interfaces
     public interface ITelefonoRepository
     {
         IEnumerable<Telefono> GetAll();
-        Telefono GetById(string num);
-        Task<Telefono> Add(Telefono telefono);
-        Task<bool> Update(Telefono telefono);
-        Task<bool> Delete(string num);
+        Telefono? GetByNumber(string numero);
+        IEnumerable<Telefono> GetByDuenio(int id);
+        void Add(Telefono telefono);
+        void Update(Telefono telefono);
+        void Delete(string numero);
     }
+
 }
