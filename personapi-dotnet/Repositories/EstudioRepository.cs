@@ -15,22 +15,36 @@ namespace personapi_dotnet.Repositories
 
         public async Task<IEnumerable<Estudio>> GetAllAsync()
         {
-            return await _context.Estudios.ToListAsync();
+            return await _context.Estudios
+                .Include(e => e.CcPerNavigation)
+                .Include(e => e.IdProfNavigation)
+                .ToListAsync();
         }
 
         public async Task<Estudio?> GetByIdAsync(int ccPer, int idProf)
         {
-            return await _context.Estudios.FirstOrDefaultAsync(e => e.CcPer == ccPer && e.IdProf == idProf);
+            return await _context.Estudios
+                .Include(e => e.CcPerNavigation)
+                .Include(e => e.IdProfNavigation)
+                .FirstOrDefaultAsync(e => e.CcPer == ccPer && e.IdProf == idProf);
         }
 
         public async Task<IEnumerable<Estudio>> GetAllByIdProfAsync(int idProf)
         {
-            return await _context.Estudios.Where(e => e.IdProf == idProf).ToListAsync();
+            return await _context.Estudios
+                .Include(e => e.CcPerNavigation)
+                .Include(e => e.IdProfNavigation)
+                .Where(e => e.IdProf == idProf)
+                .ToListAsync();
         }
 
         public async Task<IEnumerable<Estudio>> GetAllByCcPerAsync(int ccPer)
         {
-            return await _context.Estudios.Where(e => e.CcPer == ccPer).ToListAsync();
+            return await _context.Estudios
+                .Include(e => e.CcPerNavigation)
+                .Include(e => e.IdProfNavigation)
+                .Where(e => e.CcPer == ccPer)
+                .ToListAsync();
         }
 
         public async Task AddAsync(Estudio estudio)
@@ -47,7 +61,8 @@ namespace personapi_dotnet.Repositories
 
         public async Task DeleteAsync(int ccPer, int idProf)
         {
-            var estudio = await _context.Estudios.FirstOrDefaultAsync(e => e.CcPer == ccPer && e.IdProf == idProf);
+            var estudio = await _context.Estudios
+                .FirstOrDefaultAsync(e => e.CcPer == ccPer && e.IdProf == idProf);
             if (estudio != null)
             {
                 _context.Estudios.Remove(estudio);
