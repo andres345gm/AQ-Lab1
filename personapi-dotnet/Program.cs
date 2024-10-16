@@ -3,6 +3,7 @@ using personapi_dotnet.Models.Entities;
 using personapi_dotnet.Repositories; // Asegúrate de que estás importando el espacio de nombres de tus repositorios
 using personapi_dotnet.Interfaces; // Asegúrate de tener las interfaces correspondientes
 using Microsoft.OpenApi.Models;
+using System.Text.Json.Serialization; // Añadir esta línea para evitar problemas con ReferenceHandler
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,14 @@ builder.Services.AddScoped<IEstudioRepository, EstudioRepository>();
 builder.Services.AddScoped<IPersonaRepository, PersonaRepository>();
 builder.Services.AddScoped<IProfesionRepository, ProfesionRepository>();
 builder.Services.AddScoped<ITelefonoRepository, TelefonoRepository>();
+
+// Configurar JSON con ReferenceHandler.Preserve
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+        options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+    });
 
 // Configurar Swagger
 builder.Services.AddSwaggerGen(c =>
@@ -47,12 +56,13 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+app.MapControllers(); 
 
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllerRoute(
         name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}"); // Default route
+        pattern: "{controller=Home}/{action=Index}/{id?}");
 });
 
 app.Run();
