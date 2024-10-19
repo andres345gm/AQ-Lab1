@@ -1,6 +1,4 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using personapi_dotnet.Interfaces;
 using personapi_dotnet.Models.Entities;
 
@@ -38,48 +36,51 @@ namespace personapi_dotnet.Controllers.api
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Telefono telefono)
+        public async Task<IActionResult> Create(string numero, string operador, int duenioId)
         {
-            var persona = await _personaRepository.GetByIdAsync(telefono.Duenio);
+            var persona = await _personaRepository.GetByIdAsync(duenioId);
             if (persona == null)
             {
                 return BadRequest("La persona con la cédula proporcionada no existe.");
             }
 
             // Verificar si el teléfono ya existe
-            if (await _telefonoRepository.TelefonoExistsAsync(telefono.Num))
+            if (await _telefonoRepository.TelefonoExistsAsync(numero))
             {
                 return Conflict("El número de teléfono ya existe.");
             }
 
-            // Asignar el dueño al teléfono
-            telefono.DuenioNavigation = persona;
-            await _telefonoRepository.AddAsync(telefono);
-
-            var options = new JsonSerializerOptions
+            var telefono = new Telefono
             {
-                ReferenceHandler = ReferenceHandler.Preserve
+                Num = numero,
+                Oper = operador,
+                DuenioNavigation = persona
             };
 
-            var serializedTelefono = JsonSerializer.Serialize(telefono, options);
+            await _telefonoRepository.AddAsync(telefono);
 
-            return CreatedAtAction(nameof(GetByNumber), new { numero = telefono.Num }, serializedTelefono);
+            return CreatedAtAction(nameof(GetByNumber), new { numero = telefono.Num }, telefono);
         }
 
         [HttpPut("{numero}")]
-        public async Task<IActionResult> Update(string numero, [FromBody] Telefono telefono)
+        public async Task<IActionResult> Update(string numero, string operador, int duenioId)
         {
-            var existingTelefono = await _telefonoRepository.GetByNumberAsync(numero);
-            if (existingTelefono == null)
+            var telefono = await _telefonoRepository.GetByNumberAsync(numero);
+            if (telefono == null)
             {
                 return NotFound();
             }
 
-            existingTelefono.Oper = telefono.Oper;
-            existingTelefono.Duenio = telefono.Duenio;
-            existingTelefono.DuenioNavigation = await _personaRepository.GetByIdAsync(telefono.Duenio);
+            var persona = await _personaRepository.GetByIdAsync(duenioId);
+            if (persona == null)
+            {
+                return BadRequest("La persona con la cédula proporcionada no existe.");
+            }
 
-            await _telefonoRepository.UpdateAsync(existingTelefono);
+            telefono.Oper = operador;
+            telefono.DuenioNavigation = persona;
+
+            await _telefonoRepository.UpdateAsync(telefono);
 
             return NoContent();
         }

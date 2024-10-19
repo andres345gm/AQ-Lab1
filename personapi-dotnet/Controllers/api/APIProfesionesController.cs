@@ -34,19 +34,28 @@ namespace personapi_dotnet.Controllers.api
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Profesion profesion)
+        public async Task<IActionResult> Create(string nom, string des)
         {
+            var profesion = new Profesion
+            {
+                Nom = nom,
+                Des = des
+            };
             await _profesionRepository.AddAsync(profesion);
             return CreatedAtAction(nameof(GetById), new { id = profesion.Id }, profesion);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] Profesion profesion)
+        public async Task<IActionResult> Update(int id, string nom, string des)
         {
-            if (id != profesion.Id)
+            var profesion = await _profesionRepository.GetByIdAsync(id);
+            if (profesion == null)
             {
-                return BadRequest();
+                return NotFound();
             }
+
+            profesion.Nom = nom;
+            profesion.Des = des;
 
             await _profesionRepository.UpdateAsync(profesion);
             return NoContent();
